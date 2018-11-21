@@ -29,15 +29,47 @@ const yAxisGroup = graph.append("g").attr("class", "y-axis");
 
 //UPDATE function
 const update = data => {
+  data = data.filter(d => d.activity == activity);
+
   //UPDATE DOMAIN FOR AXIS
   x.domain(d3.extent(data, d => new Date(d.date)));
   y.domain([0, d3.max(data, d => d.distance)]);
 
-  const xAxis = d3.axisBottom(x).ticks(4);
-  const yAxis = d3.axisLeft(y).ticks(4);
+  //CREATE CIRCLES
+  const circles = graph.selectAll("circle").data(data);
+
+  //REMOVE CIRCLES
+  circles.exit().remove();
+
+  //UPDATE CIRCLES
+  circles.attr("cx", d => x(new Date(d.date))).attr("cx", d => y(d.distance));
+
+  //ADD CIRCLES
+  circles
+    .enter()
+    .append("circle")
+    .attr("r", 4)
+    .attr("cx", d => x(new Date(d.date)))
+    .attr("cy", d => y(d.distance))
+    .attr("fill", "#ccc");
+
+  //AXIS FORMAT
+  const xAxis = d3
+    .axisBottom(x)
+    .ticks(4)
+    .tickFormat(d3.timeFormat("%b %d"));
+  const yAxis = d3
+    .axisLeft(y)
+    .ticks(4)
+    .tickFormat(d => `${d}km`);
 
   xAxisGroup.call(xAxis);
   yAxisGroup.call(yAxis);
+
+  xAxisGroup
+    .selectAll("text")
+    .attr("transform", "rotate(-40)")
+    .attr("text-anchor", "end");
 };
 
 // data array and firestore
