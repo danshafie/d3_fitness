@@ -26,7 +26,6 @@ btns.forEach(btn => {
 
 // form submit
 form.addEventListener("submit", e => {
-  // prevent default action
   e.preventDefault();
 
   const distance = parseInt(input.value);
