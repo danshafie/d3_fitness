@@ -15,9 +15,29 @@ const graph = svg
   .attr("height", graphHeight)
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+//SCALES
+const x = d3.scaleTime().range([0, graphWidth]);
+const y = d3.scaleLinear().range([graphHeight, 0]);
+
+//AXES GROUPS
+const xAxisGroup = graph
+  .append("g")
+  .attr("class", "x-axis")
+  .attr("transform", `translate(0, ${graphHeight})`);
+
+const yAxisGroup = graph.append("g").attr("class", "y-axis");
+
 //UPDATE function
 const update = data => {
-  console.log("update bish: ", udpate);
+  //UPDATE DOMAIN FOR AXIS
+  x.domain(d3.extent(data, d => new Date(d.date)));
+  y.domain([0, d3.max(data, d => d.distance)]);
+
+  const xAxis = d3.axisBottom(x).ticks(4);
+  const yAxis = d3.axisLeft(y).ticks(4);
+
+  xAxisGroup.call(xAxis);
+  yAxisGroup.call(yAxis);
 };
 
 // data array and firestore
