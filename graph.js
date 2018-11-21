@@ -27,13 +27,40 @@ const xAxisGroup = graph
 
 const yAxisGroup = graph.append("g").attr("class", "y-axis");
 
+//line generator
+const line = d3
+  .line()
+
+  .x(function(d) {
+    return x(new Date(d.date));
+  })
+  .y(function(d) {
+    return y(d.distance);
+  });
+
+const path = graph.append("path");
+
 //UPDATE function
 const update = data => {
-  data = data.filter(d => d.activity == activity);
+  data = data.filter(d => d.activity === activity);
+
+  data.sort((a, b) => {
+    return new Date(a.date) - new Date(b.date);
+  });
+
+  console.log("data: ", data);
 
   //UPDATE DOMAIN FOR AXIS
   x.domain(d3.extent(data, d => new Date(d.date)));
   y.domain([0, d3.max(data, d => d.distance)]);
+
+  //UPDATE PATH DATA
+  path
+    .data([data])
+    .attr("fill", "none")
+    .attr("stroke", "#00bfa5")
+    .attr("stroke-width", 2)
+    .attr("d", line);
 
   //CREATE CIRCLES
   const circles = graph.selectAll("circle").data(data);
@@ -42,7 +69,7 @@ const update = data => {
   circles.exit().remove();
 
   //UPDATE CIRCLES
-  circles.attr("cx", d => x(new Date(d.date))).attr("cx", d => y(d.distance));
+  circles.attr("cx", d => x(new Date(d.date))).attr("cy", d => y(d.distance));
 
   //ADD CIRCLES
   circles
